@@ -1,3 +1,3 @@
 # PotatoHunt
 
-Game for the Game Off 2022
+Game for Game Off 2022
