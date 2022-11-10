@@ -1,7 +1,6 @@
-package hunt.potato;
+package hunt.potato.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -11,6 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import hunt.potato.Player;
+import hunt.potato.PotatoHunt;
+import hunt.potato.utils.Constants;
 
 public class GameScreen implements Screen {
     final PotatoHunt game;
@@ -61,7 +63,7 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0, 1);
-        camera.position.set(player.getX(), player.getY(), 0);
+        camera.position.set(player.getX() + player.getWidth() / 2, player.getY(), 0);
         if(camera.position.y < camera.viewportHeight / 2)
             camera.position.y = camera.viewportHeight / 2;
         if(camera.position.y > field.getHeight() * 2 - camera.viewportHeight / 2)

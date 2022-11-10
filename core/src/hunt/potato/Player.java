@@ -2,13 +2,13 @@ package hunt.potato;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import hunt.potato.enumeration.Direction;
 
 public class Player extends Actor {
     private static final int FRAME_COLS = 12, FRAME_ROWS = 1;
@@ -19,6 +19,7 @@ public class Player extends Actor {
     private final static int STARTING_Y = 2560;
     private TextureRegion currentFrame;
     private float stateTime;
+    private Direction direction = Direction.SOUTH;
     private static final float FRAME_DURATION = 0.25f;
     private float speed = 500;
     private Texture playground;
@@ -56,24 +57,41 @@ public class Player extends Actor {
 
     @Override
     public void act(float delta) {
-        currentFrame = idleFrames.get(0);
         stateTime += delta;
+        switch (direction) {
+            case NORTH:
+                currentFrame = idleFrames.get(1);
+                break;
+            case SOUTH:
+                currentFrame = idleFrames.get(0);
+                break;
+            case WEST:
+                currentFrame = idleFrames.get(2);
+                break;
+            case EAST:
+                currentFrame = idleFrames.get(3);
+                break;
+        }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             setY(getY() + speed * delta);
             currentFrame = walkAnimations.get(2).getKeyFrame(stateTime,true);
+            direction = Direction.NORTH;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             setY(getY() - speed * delta);
             currentFrame = walkAnimations.get(0).getKeyFrame(stateTime,true);
+            direction =Direction.SOUTH;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             setX(getX() - speed * delta);
             currentFrame = walkAnimations.get(1).getKeyFrame(stateTime,true);
+            direction =Direction.WEST;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             setX(getX() + speed * delta);
             currentFrame = walkAnimations.get(3).getKeyFrame(stateTime,true);
+            direction =Direction.EAST;
         }
 
         if(getY() < 0) setY(0);
