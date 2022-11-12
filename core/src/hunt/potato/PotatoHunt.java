@@ -1,6 +1,7 @@
 package hunt.potato;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,14 +11,14 @@ public class PotatoHunt extends Game {
 
 	public SpriteBatch batch;
 	public BitmapFont font;
-	private Screen mainMenuScreen;
+	private Screen gameScreen;
 
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		font = new BitmapFont();
-		mainMenuScreen = new GameScreen(this);
-		this.setScreen(mainMenuScreen);
+		font = new BitmapFont(Gdx.files.internal("font/Roman.fnt"));
+		gameScreen = new GameScreen(this);
+		setScreen(gameScreen);
 	}
 
 	public void render() {
@@ -27,6 +28,6 @@ public class PotatoHunt extends Game {
 	public void dispose() {
 		batch.dispose();
 		font.dispose();
-		mainMenuScreen.dispose();
+		gameScreen.dispose();
 	}
 }

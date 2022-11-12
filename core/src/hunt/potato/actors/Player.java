@@ -1,4 +1,4 @@
-package hunt.potato;
+package hunt.potato.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -26,7 +26,7 @@ public class Player extends Actor {
 
     public Player(Texture field){
         createFrames();
-        this.setPosition(STARTING_X, STARTING_Y);
+        setPosition(STARTING_X, STARTING_Y);
         setWidth(spriteSheet.getWidth() / FRAME_COLS);
         setHeight(spriteSheet.getHeight());
         scaleBy(-0.2f);
@@ -102,6 +102,7 @@ public class Player extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        //System.out.println(getX()+","+ getY());
         batch.draw(currentFrame,getX(),getY(),getWidth()/2,getHeight()/2,getWidth(),getHeight(),getScaleX(),getScaleY(),getRotation());
     }
 }
