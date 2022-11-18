@@ -2,6 +2,7 @@ package hunt.potato.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -51,6 +52,7 @@ public class Player extends Actor {
         walkAnimations = new Array<>(8);
         for (int j = 4; j < FRAME_COLS; j++ ) {
             Animation<TextureRegion> animation = new Animation<>(FRAME_DURATION, frameArray[0][j], frameArray[0][++j]);
+
             walkAnimations.add(animation);
         }
     }
@@ -59,18 +61,10 @@ public class Player extends Actor {
     public void act(float delta) {
         stateTime += delta;
         switch (direction) {
-            case NORTH:
-                currentFrame = idleFrames.get(1);
-                break;
-            case SOUTH:
-                currentFrame = idleFrames.get(0);
-                break;
-            case WEST:
-                currentFrame = idleFrames.get(2);
-                break;
-            case EAST:
-                currentFrame = idleFrames.get(3);
-                break;
+            case NORTH -> currentFrame = idleFrames.get(1);
+            case SOUTH -> currentFrame = idleFrames.get(0);
+            case WEST -> currentFrame = idleFrames.get(2);
+            case EAST -> currentFrame = idleFrames.get(3);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -102,7 +96,10 @@ public class Player extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        //System.out.println(getX()+","+ getY());
         batch.draw(currentFrame,getX(),getY(),getWidth()/2,getHeight()/2,getWidth(),getHeight(),getScaleX(),getScaleY(),getRotation());
+    }
+
+    public void dispose() {
+        spriteSheet.dispose();
     }
 }

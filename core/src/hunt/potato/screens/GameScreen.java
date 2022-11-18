@@ -3,8 +3,6 @@ package hunt.potato.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -25,8 +23,6 @@ public class GameScreen implements Screen {
     private MenuScreen menuScreen;
 
     private Texture field;
-    private Sound dropSound;
-    private Music rainMusic;
 
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -37,7 +33,6 @@ public class GameScreen implements Screen {
     private int potatoCount = 0;
 
 
-
     private static boolean inMenu = true;
 
     private static long startTime;
@@ -46,14 +41,6 @@ public class GameScreen implements Screen {
         this.game = game;
 
         field = new Texture(Gdx.files.internal("field.jpg"));
-
-        // load the drop sound effect and the rain background "music"
-        //dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        //rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-
-        // start the playback of the background music immediately
-		/*rainMusic.setLooping(true);
-        rainMusic.play();*/
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
@@ -159,8 +146,10 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         field.dispose();
-        /*dropSound.dispose();
-        rainMusic.dispose();*/
+        player.dispose();
+        for (var plant : plants) {
+            plant.dispose();
+        }
         batch.dispose();
         hudScreen.dispose();
         menuScreen.dispose();
