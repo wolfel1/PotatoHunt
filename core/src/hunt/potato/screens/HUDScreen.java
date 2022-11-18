@@ -10,22 +10,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.TimeUtils;
 import hunt.potato.PotatoHunt;
 import hunt.potato.utils.Constants;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.util.Date;
 
 public class HUDScreen implements Screen {
     private Table table;
     private Stage stage;
     private Skin skin;
-    private OrthographicCamera hudCamera;
+    private OrthographicCamera camera;
     private SpriteBatch batch;
     private Texture potatoTexture;
     private Label timeLabel;
@@ -35,8 +30,8 @@ public class HUDScreen implements Screen {
     public HUDScreen(PotatoHunt game) {
         potatoTexture = new Texture(Gdx.files.internal("potato.png"));
         batch = new SpriteBatch();
-        hudCamera = new OrthographicCamera();
-        hudCamera.setToOrtho(false, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         stage = new Stage();
 
         skin = new Skin();
@@ -60,12 +55,14 @@ public class HUDScreen implements Screen {
 
         timeLabel = new Label("Time", skin);
         timeLabel.setAlignment(Align.left);
+        timeLabel.setFontScale(2);
         countLabel = new Label("Count", skin);
         countLabel.setAlignment(Align.right);
+        countLabel.setFontScale(2);
         potatoImage = new Image(potatoTexture);
 
-        table.add(timeLabel).width(330).padLeft(15).padTop(10).top().left();
-        table.add(countLabel).width(20).padTop(10).padLeft(20).top().right();
+        table.add(timeLabel).width(330).padLeft(15).padTop(12).top().left();
+        table.add(countLabel).width(25).padTop(12).padLeft(25).top().right();
         table.add(potatoImage).padTop(5).padLeft(10);
     }
 
@@ -76,14 +73,11 @@ public class HUDScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        hudCamera.update();
+        camera.update();
 
-        batch.setProjectionMatrix(hudCamera.combined);
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
         stage.draw();
-        /*game.font.draw(game.batch, "" + TimeUtils.timeSinceMillis(startTime), potatoCount < 10 ? 170 : 135, hudCamera.viewportHeight - 35);
-        game.font.draw(game.batch, "" + potatoCount, potatoCount < 10 ? 170 : 135, hudCamera.viewportHeight - 35);
-        game.batch.draw(potato, 200, hudCamera.viewportHeight - 110);*/
         batch.end();
 
     }
@@ -102,7 +96,7 @@ public class HUDScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        hudCamera.setToOrtho(false, width, height);
+        camera.setToOrtho(false, width, height);
         stage.getViewport().update(width, height);
     }
 
@@ -126,5 +120,6 @@ public class HUDScreen implements Screen {
         batch.dispose();
         stage.dispose();
         potatoTexture.dispose();
+        skin.dispose();
     }
 }
