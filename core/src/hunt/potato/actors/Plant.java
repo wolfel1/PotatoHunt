@@ -44,4 +44,8 @@ public class Plant extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         batch.draw(plantFrame,getX(),getY(),getWidth()/2,getHeight()/2,getWidth(),getHeight(),getScaleX(),getScaleY(),getRotation());
     }
+
+    public void dispose() {
+        spriteSheet.dispose();
+    }
 }
