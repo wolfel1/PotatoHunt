@@ -8,29 +8,28 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import hunt.potato.PotatoHunt;
 import hunt.potato.utils.Constants;
 
-public class MenuScreen implements Screen {
+public class InstructionScreen implements Screen {
     final PotatoHunt game;
     private SpriteBatch batch;
-    private InstructionScreen instructionScreen;
 
     private OrthographicCamera camera;
 
     private Stage stage;
     private Skin skin;
     private Table table;
+    private Texture plantTexture;
 
-    public MenuScreen(PotatoHunt game) {
+    public InstructionScreen(PotatoHunt game, GameScreen screen) {
         this.game = game;
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
@@ -39,6 +38,7 @@ public class MenuScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin();
+        plantTexture = new Texture(Gdx.files.internal("plant/spritesheet.png"));
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -49,51 +49,35 @@ public class MenuScreen implements Screen {
         textButtonStyle.font = skin.getFont("default");
         textButtonStyle.overFontColor = Color.DARK_GRAY;
         textButtonStyle.focusedFontColor = Color.DARK_GRAY;
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default");
+        skin.add("default", labelStyle);
         skin.add("default", textButtonStyle);
 
         table = new Table();
         table.setFillParent(true);
         table.setSkin(skin);
         stage.addActor(table);
-        pixmap.setColor(0.1f,0.1f,0.1f,0.8f);
+        pixmap.setColor(0,0,0,1);
         pixmap.fill();
         table.setBackground(new SpriteDrawable(new Sprite(new Texture(pixmap))));
 
-        var startButton = new TextButton("Start", skin);
-        startButton.addListener(new ClickListener(){
+        var instructionText = new Label("You have to collect potato plants", skin);
+        var plantImage = new Image(new TextureRegion(plantTexture, 96,129));
+        var backButton = new TextButton("Back", skin);
+        backButton.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                ((GameScreen) game.getScreen()).setInMenu(false);
-            }
-        });
-        var instructionButton = new TextButton("Instructions", skin);
-        instructionButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                if (instructionScreen == null)
-                    instructionScreen = new InstructionScreen(game, (GameScreen) game.getScreen());
-                else
-                    instructionScreen.setInput();
-
-                game.setScreen(instructionScreen);
-            }
-        });
-        var exitButton = new TextButton("Exit", skin);
-        exitButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                Gdx.app.exit();
+                screen.back();
+                game.setScreen(screen);
             }
         });
 
-        table.add(startButton);
+        table.add(instructionText);
+        table.add(plantImage);
         table.row();
-        table.add(instructionButton);
-        table.row();
-        table.add(exitButton);
+        table.add(backButton);
     }
 
     public void setInput() {
@@ -106,6 +90,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        ScreenUtils.clear(0, 0, 0, 1);
         camera.update();
 
         batch.setProjectionMatrix(camera.combined);
@@ -137,7 +122,6 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-        instructionScreen.dispose();
         stage.dispose();
         batch.dispose();
         skin.dispose();

@@ -21,6 +21,7 @@ public class GameScreen implements Screen {
     final PotatoHunt game;
     private HUDScreen hudScreen;
     private MenuScreen menuScreen;
+    private WinScreen winScreen;
 
     private Texture field;
 
@@ -29,38 +30,47 @@ public class GameScreen implements Screen {
 
     private Player player;
     private Array<Plant> plants;
+    private int plantCount = 10;
+    private int pointsPerPlant = 5;
+    private int maxCount;
 
     private int potatoCount = 0;
 
-
     private static boolean inMenu = true;
 
-    private static long startTime;
+    private long startTime;
 
     public GameScreen(PotatoHunt game) {
-        this.game = game;
+            this.game = game;
 
-        field = new Texture(Gdx.files.internal("field.jpg"));
+            field = new Texture(Gdx.files.internal("field.jpg"));
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
-        batch = new SpriteBatch();
+            camera = new OrthographicCamera();
+            camera.setToOrtho(false, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+            batch = new SpriteBatch();
 
-        menuScreen = new MenuScreen(game);
-        hudScreen = new HUDScreen(game);
+            menuScreen = new MenuScreen(game);
+            hudScreen = new HUDScreen(game);
 
-        player = new Player(field);
+            player = new Player(field);
 
-        plants = new Array<>();
-        spawnPlants();
-
+            plants = new Array<>();
     }
 
     private void spawnPlants() {
-        for (int i = 0; i < 10; i++) {
+        for (var plant : plants) {
+            plant.dispose();
+        }
+        plants.clear();
+        for (int i = 0; i < plantCount; i++) {
             Plant plant = new Plant();
             plants.add(plant);
         }
+        maxCount = plantCount * pointsPerPlant;
+    }
+
+    public void back() {
+        menuScreen.setInput();
     }
 
     @Override
@@ -92,6 +102,11 @@ public class GameScreen implements Screen {
         batch.end();
         if (inMenu) {
             menuScreen.render(delta);
+        } else if (potatoCount == maxCount) {
+            if (winScreen == null) {
+                winScreen = new WinScreen(game, TimeUtils.timeSinceMillis(startTime));
+            }
+            winScreen.render(delta);
         } else {
 
             player.act(delta);
@@ -104,13 +119,17 @@ public class GameScreen implements Screen {
                 Rectangle r = new Rectangle(player.getX(), player.getY(), player.getWidth(), player.getHeight());
                 Rectangle s = new Rectangle(plant.getX(), plant.getY(), plant.getWidth(), plant.getHeight());
                 if (r.overlaps(s)) {
-                    potatoCount += 5;
+                    potatoCount += pointsPerPlant;
                     iter.remove();
                 }
             }
-
-            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-                inMenu = true;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            if (winScreen != null) {
+                winScreen.dispose();
+                winScreen = null;
+            }
+            inMenu = true;
         }
     }
 
@@ -123,12 +142,10 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-        inMenu = true;
     }
 
     @Override
     public void resume() {
-        inMenu = false;
     }
 
     @Override
@@ -136,9 +153,12 @@ public class GameScreen implements Screen {
 
     }
 
-    public static void setInMenu(boolean inMenu) {
-        if (!inMenu)
+    public void setInMenu(boolean inMenu) {
+        if (!inMenu) {
             startTime = TimeUtils.millis();
+            potatoCount = 0;
+            spawnPlants();
+        }
 
         GameScreen.inMenu = inMenu;
     }
@@ -153,5 +173,8 @@ public class GameScreen implements Screen {
         batch.dispose();
         hudScreen.dispose();
         menuScreen.dispose();
+        if (winScreen != null) {
+            winScreen.dispose();
+        }
     }
 }

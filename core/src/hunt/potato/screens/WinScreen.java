@@ -8,35 +8,38 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.ScreenUtils;
 import hunt.potato.PotatoHunt;
 import hunt.potato.utils.Constants;
 
-public class MenuScreen implements Screen {
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
+public class WinScreen implements Screen {
     final PotatoHunt game;
     private SpriteBatch batch;
-    private InstructionScreen instructionScreen;
 
     private OrthographicCamera camera;
 
     private Stage stage;
     private Skin skin;
     private Table table;
+    private Label timeLabel;
 
-    public MenuScreen(PotatoHunt game) {
+
+    public WinScreen(PotatoHunt game, long time) {
         this.game = game;
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
         stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
 
         skin = new Skin();
 
@@ -45,11 +48,9 @@ public class MenuScreen implements Screen {
         pixmap.fill();
         skin.add("default", game.font);
         skin.add("white", new Texture(pixmap));
-        var textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = skin.getFont("default");
-        textButtonStyle.overFontColor = Color.DARK_GRAY;
-        textButtonStyle.focusedFontColor = Color.DARK_GRAY;
-        skin.add("default", textButtonStyle);
+        var labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default");
+        skin.add("default", labelStyle);
 
         table = new Table();
         table.setFillParent(true);
@@ -59,45 +60,21 @@ public class MenuScreen implements Screen {
         pixmap.fill();
         table.setBackground(new SpriteDrawable(new Sprite(new Texture(pixmap))));
 
-        var startButton = new TextButton("Start", skin);
-        startButton.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                ((GameScreen) game.getScreen()).setInMenu(false);
-            }
-        });
-        var instructionButton = new TextButton("Instructions", skin);
-        instructionButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                if (instructionScreen == null)
-                    instructionScreen = new InstructionScreen(game, (GameScreen) game.getScreen());
-                else
-                    instructionScreen.setInput();
+        var winLabel = new Label("You win!", skin);
+        timeLabel = new Label("", skin);
+        setTimeLabel(time);
 
-                game.setScreen(instructionScreen);
-            }
-        });
-        var exitButton = new TextButton("Exit", skin);
-        exitButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                Gdx.app.exit();
-            }
-        });
-
-        table.add(startButton);
+        table.add(winLabel);
         table.row();
-        table.add(instructionButton);
-        table.row();
-        table.add(exitButton);
+        table.add(timeLabel);
     }
 
-    public void setInput() {
-        Gdx.input.setInputProcessor(stage);
+    public void setTimeLabel(long time) {
+        int hours = (int) (time / (60 * 60 * 1000));
+        int minutes = (int) (time / (60 * 1000)) % 60;
+        int seconds = (int) (time / 1000) % 60;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        timeLabel.setText("Your time: " +formatter.format(LocalTime.of(hours, minutes, seconds)));
     }
     @Override
     public void show() {
@@ -137,9 +114,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-        instructionScreen.dispose();
         stage.dispose();
         batch.dispose();
-        skin.dispose();
     }
 }
